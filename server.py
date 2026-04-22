@@ -11,7 +11,7 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 from typing import Optional, List
 import math, os
 
-# ── App setup ─────────────────────────────────────────────────
+# ── App setup ────────────────────────────────────────────
 app = FastAPI(
     title="Fertility Health Dashboard API",
     description="Dynamic backend for fertility dataset analysis",
@@ -29,7 +29,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="."), name="static")
 
 
-# ── Load dataset once at startup ──────────────────────────────
+# ── Load dataset once at startup ───────────────────────────
 def load_df():
     for fname in ["fertility_clean.csv", "fertility_health_dataset.csv"]:
         if os.path.exists(fname):
@@ -47,7 +47,7 @@ DF_FULL = load_df()
 print(f"✓ Dataset loaded: {DF_FULL.shape[0]:,} rows × {DF_FULL.shape[1]} columns")
 
 
-# ── Filter helper ─────────────────────────────────────────────
+# ── Filter helper ───────────────────────────────────────────
 def filter_df(
     age_min: int = 20,
     age_max: int = 45,
