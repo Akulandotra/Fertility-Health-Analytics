@@ -1,12 +1,3 @@
-# =============================================================
-#  FILE: 02_eda.py
-#  PURPOSE: Perform full Exploratory Data Analysis on the
-#           clean dataset — correlation heatmap, histograms
-#           with skewness, comparative boxplots, and success
-#           rate analysis by lifestyle categories.
-#           Run AFTER 01_preprocessing.py
-# =============================================================
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
