@@ -18,14 +18,14 @@ NUM = ["Female_Age","Male_Age","Female_BMI","Male_BMI",
        "Stress_Level","Sleep_Quality","Past_Pregnancies",
        "Sperm_Count_M_per_mL","Sperm_Motility_Pct"]
 
-# ── A: Summary Statistics ─────────────────────────────────────
+# ── A: Summary Statistics ────────────────────────────────
 print("=" * 60)
 print("A — Summary Statistics")
 print("=" * 60)
 print(df[NUM].describe().round(2).T.to_string())
 print()
 
-# ── B: Correlation Heatmap ────────────────────────────────────
+# ── B: Correlation Heatmap ─────────────────────────────────
 print("Plotting Correlation Heatmap …")
 corr = df[NUM + ["Success"]].corr()
 
@@ -48,7 +48,7 @@ pairs["abs"] = pairs["r"].abs()
 print(pairs.sort_values("abs", ascending=False).head(8)[["A","B","r"]].to_string(index=False))
 print()
 
-# ── C: Histograms with Skewness ───────────────────────────────
+# ── C: Histograms with Skewness ────────────────────────────
 print("Plotting Histograms …")
 from scipy import stats as sc_stats
 
@@ -83,7 +83,7 @@ sk["Interpretation"] = sk["Skewness"].apply(
 print(sk.to_string(index=False))
 print()
 
-# ── D: Comparative Boxplots by Outcome ───────────────────────
+# ── D: Comparative Boxplots by Outcome ────────────────────
 print("Plotting Boxplots by Outcome …")
 pal = {"Success":"#2ecc71","Failure":"#e74c3c"}
 
@@ -107,7 +107,7 @@ plt.tight_layout()
 plt.savefig("02_boxplots.png", bbox_inches="tight")
 plt.show()
 
-# ── E: Success Rate by Lifestyle Factor ──────────────────────
+# ── E: Success Rate by Lifestyle Factor ────────────────────
 print("Plotting Lifestyle Success Rates …")
 lifestyle_cols = ["PCOS","Period_Regularity","Male_Smokes",
                   "Female_Exercise","Female_Alcohol","Male_Alcohol"]
@@ -127,7 +127,7 @@ plt.tight_layout()
 plt.savefig("02_lifestyle.png", bbox_inches="tight")
 plt.show()
 
-# ── F: Age group success ──────────────────────────────────────
+# ── F: Age group success ────────────────────────────────────
 df["AgeGroup"] = pd.cut(df["Female_Age"],
     bins=[19,25,30,35,40,45],
     labels=["20-25","26-30","31-35","36-40","41-45"])
