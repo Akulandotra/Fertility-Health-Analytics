@@ -30,7 +30,7 @@ print(f"""
   Level : α = {alpha}
 """)
 
-# ── Group Stats ───────────────────────────────────────────────
+# ── Group Stats ────────────────────────────────────────────
 n1, n2   = len(grp_s), len(grp_f)
 m1, m2   = grp_s.mean(), grp_f.mean()
 s1, s2   = grp_s.std(ddof=1), grp_f.std(ddof=1)
@@ -38,7 +38,7 @@ print(f"  Success  n={n1:,}  mean={m1:.4f}  std={s1:.4f}")
 print(f"  Failure  n={n2:,}  mean={m2:.4f}  std={s2:.4f}")
 print(f"  Difference in means = {m1-m2:.4f}\n")
 
-# ── Welch T-Test ──────────────────────────────────────────────
+# ── Welch T-Test ────────────────────────────────────────────
 t_stat, p_val = stats.ttest_ind(grp_s, grp_f, equal_var=False)
 print("-" * 65)
 print(f"  t-statistic : {t_stat:.4f}")
@@ -47,7 +47,7 @@ print(f"  α           : {alpha}")
 print("-" * 65)
 print(f"  Decision    : {'REJECT H0 ✓' if p_val < alpha else 'FAIL TO REJECT H0'}")
 
-# ── Z-Test (manual) ───────────────────────────────────────────
+# ── Z-Test (manual) ─────────────────────────────────────────
 se   = np.sqrt(s1**2/n1 + s2**2/n2)
 z    = (m1 - m2) / se
 z_p  = 2 * (1 - stats.norm.cdf(abs(z)))
@@ -55,7 +55,7 @@ print(f"\n  Z-Test: z = {z:.4f}  p = {z_p:.6f}")
 print(f"  Decision : {'REJECT H0 ✓' if z_p < alpha else 'FAIL TO REJECT H0'}")
 print("  → T-Test and Z-Test agree — result is robust.\n")
 
-# ── Cohen's d ─────────────────────────────────────────────────
+# ── Cohen's d ───────────────────────────────────────────────
 pool = np.sqrt(((n1-1)*s1**2 + (n2-1)*s2**2) / (n1+n2-2))
 d    = (m1 - m2) / pool
 eff  = ("Negligible" if abs(d)<0.2 else "Small" if abs(d)<0.5
