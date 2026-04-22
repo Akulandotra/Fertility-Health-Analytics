@@ -96,7 +96,7 @@ def serve_dashboard():
     return FileResponse("dashboard 1.html")
 
 
-# ── 1. Overview Metrics ───────────────────────────────────────
+# ── 1. Overview Metrics ────────────────────────────────────
 @app.get("/api/overview")
 def overview(
     age_min: int = Query(20), age_max: int = Query(45),
@@ -215,7 +215,7 @@ def lifestyle(
     return JSONResponse(clean(result))
 
 
-# ── 3. Histograms ─────────────────────────────────────────────
+# ── 3. Histograms ───────────────────────────────────────────
 @app.get("/api/histogram/{column}")
 def histogram(
     column: str,
@@ -383,7 +383,7 @@ def hypothesis(
     return JSONResponse(clean(result))
 
 
-# ── 6. Regression ─────────────────────────────────────────────
+# ── 6. Regression ───────────────────────────────────────────
 @app.get("/api/regression/{reg_num}")
 def regression(
     reg_num: int,
