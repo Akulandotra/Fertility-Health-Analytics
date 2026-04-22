@@ -1,12 +1,3 @@
-# =============================================================
-#  FILE: 03_hypothesis_testing.py
-#  PURPOSE: Objective 1 — Hypothesis Testing
-#           Test whether Sperm Count differs significantly
-#           between pregnancy Success and Failure groups.
-#           Uses Welch's T-Test + manual Z-Test + Cohen's d.
-#           Run AFTER 02_eda.py
-# =============================================================
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
