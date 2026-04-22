@@ -1,20 +1,3 @@
-# =============================================================
-#  FILE: 04_regression.py
-#  PURPOSE: Objectives 2 & 3 — Two Simple Linear Regressions
-#
-#  Regression 1: Female_Age → Male_Age
-#    Justification: Pearson r = 0.9593 (strongest in heatmap)
-#    Insight: Couples share similar age — social pairing
-#
-#  Regression 2: Sperm_Motility_Pct → Sperm_Count_M_per_mL
-#    Justification: Clinical pair — demonstrates SLR limits
-#    Key lesson: Low R² → motivates Multiple Regression
-#
-#  Each model: Train/Test split, R², MAE, MSE, RMSE,
-#              Scatter, Actual vs Predicted, Residual Plot
-#  Run AFTER 03_hypothesis_testing.py
-# =============================================================
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
