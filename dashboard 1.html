@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fertility Health Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#f4f1ec;--white:#fff;--ink:#1a1a1a;--ink2:rgba(26,26,26,.55);--ink3:rgba(26,26,26,.2);
+  --border:rgba(26,26,26,.1);--sage:#3a7550;--sage2:#2d5c3e;--sagel:#e4f0e9;
+  --coral:#bf4530;--corall:#fae8e4;--gold:#b5841c;--goldl:#faf0d8;--plum:#6a3f6a;
+  --blue:#2a6ba0;--r:10px;--rL:16px;
+  --ff:"Inter",sans-serif;--ffd:"Playfair Display",serif;--ffm:"JetBrains Mono",monospace;
+}
+*,::before,::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--ff);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.65;min-height:100vh;display:flex}
+
+/* SIDEBAR */
+aside{
+  width:260px;flex-shrink:0;background:#1a2e20;
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;overflow-y:auto;z-index:100;
+}
+.aside-logo{padding:1.6rem 1.4rem 1rem;border-bottom:1px solid rgba(255,255,255,.1)}
+.aside-logo-icon{font-size:1.8rem;margin-bottom:.4rem}
+.aside-logo-title{font-family:var(--ffd);font-size:1.1rem;color:#fff;line-height:1.2}
+.aside-logo-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-top:.2rem}
+
+.aside-section{padding:.9rem 1.4rem .4rem;font-size:9.5px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.aside-nav{list-style:none;padding:0 .6rem .5rem}
+.aside-nav li a{
+  display:flex;align-items:center;gap:.6rem;
+  padding:.55rem .8rem;border-radius:8px;
+  color:rgba(255,255,255,.65);font-size:12.5px;font-weight:500;
+  text-decoration:none;transition:all .18s;cursor:pointer;
+}
+.aside-nav li a:hover{background:rgba(255,255,255,.08);color:#fff}
+.aside-nav li a.on{background:rgba(90,180,120,.18);color:#7ecf9a}
+.aside-nav li a span.icon{font-size:15px;width:18px;text-align:center}
+
+.filters-wrap{padding:1rem 1.4rem;flex:1;overflow-y:auto}
+.filters-wrap h4{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.8rem;font-weight:600}
+.fgrp{margin-bottom:.85rem}
+.fgrp label{font-size:10.5px;color:rgba(255,255,255,.5);display:block;margin-bottom:.3rem;letter-spacing:.5px}
+select,input[type=range]{
+  width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.85);border-radius:6px;padding:5px 8px;font-size:12px;
+  font-family:var(--ff);cursor:pointer;outline:none;
+}
+select:focus{border-color:rgba(90,180,120,.5)}
+input[type=range]{padding:3px 0;accent-color:#7ecf9a;background:none;border:none}
+.range-row{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+.aside-reset{
+  margin:0 1.4rem 1.2rem;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.15);
+  background:transparent;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;
+  font-family:var(--ff);transition:all .18s;width:calc(100% - 2.8rem);
+}
+.aside-reset:hover{border-color:var(--coral);color:var(--coral)}
+.aside-status{
+  margin:0 1.4rem 1.4rem;padding:.75rem;border-radius:8px;
+  background:rgba(90,180,120,.12);border:1px solid rgba(90,180,120,.2);
+  text-align:center;
+}
+.aside-status-n{font-family:var(--ffm);font-size:1.3rem;font-weight:500;color:#7ecf9a}
+.aside-status-lbl{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.8px}
+
+/* MAIN AREA */
+main{flex:1;overflow-y:auto;min-width:0}
+.topbar{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:.75rem 2rem;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:90;
+}
+.topbar-title{font-family:var(--ffd);font-size:1.15rem}
+.topbar-pill{
+  font-size:11px;font-family:var(--ffm);
+  background:var(--sagel);color:var(--sage2);
+  padding:4px 12px;border-radius:20px;border:1px solid rgba(58,117,80,.2);
+}
+.content{padding:1.75rem 2rem 4rem}
+
+/* SECTION HEADERS */
+.sec-h{font-family:var(--ffd);font-size:1.55rem;color:var(--ink);margin-bottom:.2rem}
+.sec-s{font-size:12.5px;color:var(--ink2);margin-bottom:1.4rem;line-height:1.6}
+
+/* PAGES */
+.pg{display:none}
+.pg.on{display:block}
+
+/* METRIC ROW */
+.mrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:.85rem;margin-bottom:1.5rem}
+.mc{background:var(--white);border:1px solid var(--border);border-radius:var(--rL);padding:1.1rem;position:relative;overflow:hidden;transition:box-shadow .2s}
+.mc:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.mc-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--rL) var(--rL) 0 0}
+.mc-l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--ink2);margin-bottom:.45rem}
+.mc-v{font-family:var(--ffm);font-size:1.65rem;font-weight:500;line-height:1}
+.mc-s{font-size:11px;color:var(--ink2);margin-top:.25rem}
+
+/* GRID LAYOUTS */
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1rem;margin-bottom:1rem}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1rem}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1rem}
+
+/* CHART CARDS */
+.cc{background:var(--white);border:1px solid var(--border);border-radius:var(--rL);padding:1.3rem;transition:box-shadow .2s}
+.cc:hover{box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.cc-t{font-weight:600;font-size:.9rem;margin-bottom:.15rem}
+.cc-s{font-size:11px;color:var(--ink2);margin-bottom:1rem}
+.cw{position:relative;width:100%}
+
+/* HEATMAP */
+.hm-wrap{overflow-x:auto}
+.hm-cell{display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:9px;font-weight:600;cursor:default;transition:transform .12s}
+.hm-cell:hover{transform:scale(1.1);z-index:5;position:relative}
+
+/* STAT CHIPS */
+.chips{display:flex;gap:.65rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.chip{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.55rem .9rem}
+.chip-l{font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2);margin-bottom:.15rem}
+.chip-v{font-family:var(--ffm);font-size:1.05rem;font-weight:500;color:var(--sage)}
+
+/* RESULT BOXES */
+.rbox{border-radius:var(--r);padding:1rem 1.3rem;margin-bottom:1.1rem;border-left:4px solid}
+.rbox-g{background:var(--sagel);border-color:var(--sage)}
+.rbox-r{background:var(--corall);border-color:var(--coral)}
+.rbox-y{background:var(--goldl);border-color:var(--gold)}
+.rbox-title{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin-bottom:.35rem}
+.rbox-text{font-size:13px;line-height:1.75}
+
+/* REGRESSION PRED */
+.pred-box{background:var(--sagel);border:1px solid rgba(58,117,80,.2);border-radius:var(--r);padding:1.2rem;margin-top:1.2rem}
+.pred-box h4{font-weight:600;font-size:.9rem;color:var(--sage2);margin-bottom:.85rem}
+.srow{display:flex;align-items:center;gap:.9rem;margin-bottom:.75rem}
+.srow label{font-size:12.5px;color:var(--ink2);width:155px;flex-shrink:0}
+.srow input[type=range]{flex:1;accent-color:var(--sage)}
+.srow-v{font-family:var(--ffm);font-size:13px;font-weight:500;width:48px;text-align:right}
+.pred-out{background:var(--white);border-radius:8px;padding:.85rem 1.1rem;display:flex;gap:1.5rem;flex-wrap:wrap;border:1px solid rgba(58,117,80,.18);margin-top:.4rem}
+.po-l{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink2)}
+.po-v{font-family:var(--ffm);font-size:1.3rem;font-weight:500;color:var(--sage);margin-top:.15rem}
+
+/* LIFESTYLE TABLE */
+.ltbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.ltbl th{text-align:left;padding:.55rem .85rem;font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink2);border-bottom:1px solid var(--border);background:var(--bg);font-weight:600}
+.ltbl td{padding:.6rem .85rem;border-bottom:1px solid rgba(26,26,26,.04)}
+.ltbl tr:hover td{background:var(--bg)}
+.bdg{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:12px;font-weight:500}
+.bdg-u{background:#e4f0e9;color:#26613d}
+.bdg-d{background:var(--corall);color:var(--coral)}
+
+/* SCATTER CONTROLS */
+.scatter-ctrl{display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem}
+.scatter-ctrl>div label{font-size:11px;color:var(--ink2);display:block;margin-bottom:3px}
+.scatter-ctrl select{background:var(--bg);border:1px solid var(--border);color:var(--ink);font-family:var(--ff);font-size:12.5px;padding:6px 10px;border-radius:6px;cursor:pointer}
+
+/* LOADING OVERLAY */
+.loading{
+  position:fixed;inset:0;background:rgba(244,241,236,.8);
+  display:flex;align-items:center;justify-content:center;z-index:999;
+  backdrop-filter:blur(3px);transition:opacity .3s;
+}
+.loading.hide{opacity:0;pointer-events:none}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--sage);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ERROR TOAST */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  background:#1a1a1a;color:#fff;padding:.75rem 1.25rem;
+  border-radius:10px;font-size:13px;z-index:9999;
+  transform:translateY(80px);transition:transform .3s;
+}
+.toast.show{transform:translateY(0)}
+
+/* DIVIDER */
+.div{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+
+@media(max-width:768px){
+  aside{display:none}
+  .content{padding:1rem}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading" id="loadingOverlay">
+  <div style="text-align:center">
+    <div class="spinner"></div>
+    <div style="margin-top:.75rem;font-size:12px;color:var(--ink2)">Fetching from server…</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- SIDEBAR -->
+<aside>
+  <div class="aside-logo">
+    <div class="aside-logo-icon">🌿</div>
+    <div class="aside-logo-title">Fertility Health<br>Analytics</div>
+  </div>
+
+  <div class="aside-section">Navigation</div>
+  <ul class="aside-nav" id="sideNav">
+    <li><a onclick="goPage('overview')" class="on"><span class="icon">📊</span>Overview</a></li>
+    <li><a onclick="goPage('eda')"><span class="icon">🔬</span>EDA & Distributions</a></li>
+    <li><a onclick="goPage('lifestyle')"><span class="icon">🌿</span>Lifestyle Factors</a></li>
+    <li><a onclick="goPage('scatter')"><span class="icon">🔭</span>Clinical Explorer</a></li>
+    <li><a onclick="goPage('hypothesis')"><span class="icon">📐</span>Hypothesis Testing</a></li>
+    <li><a onclick="goPage('regression')"><span class="icon">📈</span>Regression</a></li>
+  </ul>
+
+  <div class="aside-section">Filters</div>
+  <div class="filters-wrap">
+    <div class="fgrp">
+      <label>Female Age: <span id="ageLabel">20–45</span></label>
+      <input type="range" id="fAgeMin" min="20" max="45" value="20" step="1" oninput="updateAgeLabel()">
+      <input type="range" id="fAgeMax" min="20" max="45" value="45" step="1" oninput="updateAgeLabel()">
+      <div class="range-row"><span>20</span><span>45</span></div>
+    </div>
+    <div class="fgrp">
+<label>PCOS</label>
+<select id="fPcos"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">No</option>
+<option style="background:white;color:black;">Yes</option>
+</select>
+</div>
+
+<div class="fgrp">
+<label>Period Regularity</label>
+<select id="fPeriod"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">Regular</option>
+<option style="background:white;color:black;">Irregular</option>
+</select>
+</div>
+
+<div class="fgrp">
+<label>Female Smoking</label>
+<select id="fFsmoke"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">No</option>
+<option style="background:white;color:black;">Yes</option>
+</select>
+</div>
+
+<div class="fgrp">
+<label>Male Smoking</label>
+<select id="fMsmoke"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">No</option>
+<option style="background:white;color:black;">Yes</option>
+</select>
+</div>
+
+<div class="fgrp">
+<label>Female Exercise</label>
+<select id="fFex"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">Active</option>
+<option style="background:white;color:black;">Moderate</option>
+<option style="background:white;color:black;">Light</option>
+<option style="background:white;color:black;">No_Exercise</option>
+</select>
+</div>
+
+<div class="fgrp">
+<label>Male Exercise</label>
+<select id="fMex"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">Active</option>
+<option style="background:white;color:black;">Moderate</option>
+<option style="background:white;color:black;">Light</option>
+<option style="background:white;color:black;">No_Exercise</option>
+</select>
+</div>
+
+<div class="fgrp">
+<label>Female Alcohol</label>
+<select id="fFalc"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">No_Alcohol</option>
+<option style="background:white;color:black;">Low</option>
+<option style="background:white;color:black;">Moderate</option>
+<option style="background:white;color:black;">High</option>
+</select>
+</div>
+
+<div class="fgrp">
+<label>Male Alcohol</label>
+<select id="fMalc"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">No_Alcohol</option>
+<option style="background:white;color:black;">Low</option>
+<option style="background:white;color:black;">Moderate</option>
+<option style="background:white;color:black;">High</option>
+</select>
+</div>
+
+<div class="fgrp">
+<label>Outcome</label>
+<select id="fOutcome"
+style="background:#1e3a2f;color:white;border:1px solid #6ee7b7;padding:8px;border-radius:8px;width:100%;">
+<option value="" style="background:white;color:black;">All</option>
+<option style="background:white;color:black;">Success</option>
+<option style="background:white;color:black;">Failure</option>
+</select>
+</div>
+  </div>
+  <button class="aside-reset" onclick="resetFilters()">↺ Reset All Filters</button>
+  <div class="aside-status">
+    <div class="aside-status-n" id="sideN">2,000</div>
+    <div class="aside-status-lbl">couples filtered</div>
+    <div style="font-family:var(--ffm);font-size:1rem;color:#82c49a;margin-top:.3rem" id="sideSR">19.8%</div>
+    <div class="aside-status-lbl">success rate</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main>
+  <div class="topbar">
+    <div class="topbar-title">Fertility Health — Dashboard</div>
+    <div class="topbar-pill" id="topPill">2,000 couples · 19.8% success</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="pg on" id="pg-overview">
+      <div class="sec-h">Dataset Overview</div>
+      <div class="sec-s" id="ov-sub">Fertility Health Dataset · 2,000 rows · 19 features · All values live</div>
+      <div class="mrow">
+        <div class="mc"><div class="mc-bar" style="background:var(--sage)"></div><div class="mc-l">Filtered Couples</div><div class="mc-v" style="color:var(--sage)" id="mc-n">—</div><div class="mc-s" id="mc-ns">of 2,000</div></div>
+        <div class="mc"><div class="mc-bar" style="background:var(--coral)"></div><div class="mc-l">Success Rate</div><div class="mc-v" style="color:var(--coral)" id="mc-sr">—</div><div class="mc-s" id="mc-srs">—</div></div>
+        <div class="mc"><div class="mc-bar" style="background:var(--plum)"></div><div class="mc-l">Avg Female Age</div><div class="mc-v" style="color:var(--plum)" id="mc-fa">—</div><div class="mc-s">years</div></div>
+        <div class="mc"><div class="mc-bar" style="background:var(--gold)"></div><div class="mc-l">Avg Sperm Count</div><div class="mc-v" style="color:var(--gold)" id="mc-sc">—</div><div class="mc-s">M/mL</div></div>
+        <div class="mc"><div class="mc-bar" style="background:var(--blue)"></div><div class="mc-l">Avg Sleep Quality</div><div class="mc-v" style="color:var(--blue)" id="mc-sl">—</div><div class="mc-s">/ 10</div></div>
+        <div class="mc"><div class="mc-bar" style="background:#8b6914"></div><div class="mc-l">PCOS Prevalence</div><div class="mc-v" style="color:#8b6914" id="mc-pcos">—</div><div class="mc-s">in filtered</div></div>
+      </div>
+      <div class="g2">
+        <div class="cc"><div class="cc-t">Pregnancy Outcome Split</div><div class="cc-s">Live count from filtered data</div><div class="cw" style="height:240px"><canvas id="c-outcome" role="img" aria-label="Pregnancy outcome donut"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Success Rate by Female Age Group</div><div class="cc-s">Fertility decline with age — recalculates live</div><div class="cw" style="height:240px"><canvas id="c-agesr" role="img" aria-label="Success rate by age"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Clinical Averages — Success vs Failure</div><div class="cc-s">Grouped comparison on filtered subset</div><div class="cw" style="height:240px"><canvas id="c-clinavg" role="img" aria-label="Clinical averages"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Feature Skewness</div><div class="cc-s">Computed on filtered rows — Past_Pregnancies most skewed</div><div class="cw" style="height:240px"><canvas id="c-skew" role="img" aria-label="Skewness"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ══ EDA ══ -->
+    <div class="pg" id="pg-eda">
+      <div class="sec-h">EDA & Distributions</div>
+      <div class="sec-s">Correlation heatmap + histograms with live skewness + comparative boxplots — all from filtered data</div>
+      <div class="cc" style="margin-bottom:1rem">
+        <div class="cc-t">Correlation Heatmap</div>
+        <div class="cc-s">Pearson r recalculated on filtered subset · Hover any cell for exact value</div>
+        <div class="hm-wrap"><div id="hmContainer"></div></div>
+      </div>
+      <div class="sec-h" style="font-size:1.1rem;margin-top:1.5rem">Histograms with Skewness</div>
+      <div class="g4" id="hist-grid"></div>
+      <div class="sec-h" style="font-size:1.1rem;margin-top:1rem">Boxplots by Outcome</div>
+      <div class="g3">
+        <div class="cc"><div class="cc-t">Sperm Count by Outcome</div><div class="cw" style="height:220px"><canvas id="c-box1" role="img" aria-label="Sperm count boxplot"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Sleep Quality by Outcome</div><div class="cw" style="height:220px"><canvas id="c-box2" role="img" aria-label="Sleep quality boxplot"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Stress Level by Outcome</div><div class="cw" style="height:220px"><canvas id="c-box3" role="img" aria-label="Stress level boxplot"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ══ LIFESTYLE ══ -->
+    <div class="pg" id="pg-lifestyle">
+      <div class="sec-h">Visualization — Lifestyle Factors</div>
+      <div class="sec-s">Success rate per category · Bars recompute from filtered rows · Colour = vs overall baseline</div>
+      <div class="g3" id="lifestyle-charts"></div>
+      <hr class="div">
+      <div class="cc-t" style="margin-bottom:.5rem">Impact Table — All Lifestyle Variables (Live)</div>
+      <div class="cc-s" style="margin-bottom:.75rem">Sorted by success rate ↓ · Diff column = vs overall filtered success rate</div>
+      <div class="cc" style="overflow-x:auto"><table class="ltbl"><thead><tr><th>Factor</th><th>Category</th><th>Count</th><th>Success Rate</th><th>vs Overall</th></tr></thead><tbody id="ltbody"></tbody></table></div>
+    </div>
+
+    <!-- ══ SCATTER ══ -->
+    <div class="pg" id="pg-scatter">
+      <div class="sec-h">Visualization — Clinical Explorer</div>
+      <div class="sec-s">Scatter plot of any two clinical variables · Colour by outcome · Fetches fresh data on every axis or filter change</div>
+      <div class="cc" style="margin-bottom:1rem">
+        <div class="scatter-ctrl">
+          <div><label>X Axis</label>
+            <select id="scX" onchange="loadScatter()">
+              <option value="Sperm_Count_M_per_mL">Sperm Count (M/mL)</option>
+              <option value="Sperm_Motility_Pct">Sperm Motility (%)</option>
+              <option value="Female_Age">Female Age</option>
+              <option value="Male_Age">Male Age</option>
+              <option value="Stress_Level">Stress Level</option>
+              <option value="Sleep_Quality">Sleep Quality</option>
+              <option value="Female_BMI">Female BMI</option>
+            </select>
+          </div>
+          <div><label>Y Axis</label>
+            <select id="scY" onchange="loadScatter()">
+              <option value="Sperm_Motility_Pct">Sperm Motility (%)</option>
+              <option value="Sperm_Count_M_per_mL">Sperm Count (M/mL)</option>
+              <option value="Sleep_Quality">Sleep Quality</option>
+              <option value="Stress_Level">Stress Level</option>
+              <option value="Male_Age">Male Age</option>
+              <option value="Female_BMI">Female BMI</option>
+            </select>
+          </div>
+          <div><label>Colour by</label>
+            <select id="scColor" onchange="renderScatter()">
+              <option value="outcome">Pregnancy Outcome</option>
+              <option value="pcos">PCOS Status</option>
+            </select>
+          </div>
+          <div style="margin-top:auto;font-family:var(--ffm);font-size:12px;color:var(--ink2)" id="scCount"></div>
+        </div>
+        <div class="cw" style="height:420px"><canvas id="c-scatter" role="img" aria-label="Clinical scatter plot"></canvas></div>
+        <div style="display:flex;gap:1.5rem;margin-top:.75rem;font-size:12px;color:var(--ink2);flex-wrap:wrap">
+          <span><span style="width:9px;height:9px;border-radius:50%;background:var(--sage);display:inline-block;margin-right:4px"></span>Success</span>
+          <span><span style="width:9px;height:9px;border-radius:50%;background:var(--coral);display:inline-block;margin-right:4px"></span>Failure</span>
+          <span style="margin-left:auto;font-style:italic">WHO: Sperm Count &gt;15 M/mL · Motility &gt;40%</span>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="cc"><div class="cc-t">Sperm Count Distribution by Outcome</div><div class="cc-s" id="sc-dist-s">—</div><div class="cw" style="height:220px"><canvas id="c-scdist" role="img" aria-label="Sperm count distribution"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Sperm Motility Distribution by Outcome</div><div class="cc-s" id="sm-dist-s">—</div><div class="cw" style="height:220px"><canvas id="c-smdist" role="img" aria-label="Sperm motility distribution"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ══ HYPOTHESIS ══ -->
+    <div class="pg" id="pg-hypothesis">
+      <div class="sec-h">Hypothesis Testing</div>
+      <div class="sec-s">Welch's T-Test + Z-Test · α = 0.05</div>
+      <div class="fgrp" style="max-width:320px;margin-bottom:1.2rem">
+        <label style="font-size:12px;color:var(--ink2);display:block;margin-bottom:.35rem">Variable to test (Success vs Failure)</label>
+        <select id="hypVar" onchange="loadHypothesis()" style="background:var(--white);border:1px solid var(--border);color:var(--ink);padding:7px 10px;border-radius:8px;font-size:13px;font-family:var(--ff);width:100%">
+          <option value="Sperm_Count_M_per_mL">Sperm Count (M/mL)</option>
+          <option value="Sperm_Motility_Pct">Sperm Motility (%)</option>
+          <option value="Sleep_Quality">Sleep Quality</option>
+          <option value="Stress_Level">Stress Level</option>
+          <option value="Female_Age">Female Age</option>
+          <option value="Female_BMI">Female BMI</option>
+        </select>
+      </div>
+      <div class="g2" style="margin-bottom:1.2rem">
+        <div class="rbox rbox-g"><div class="rbox-title" style="color:var(--sage)">H₀ — Null Hypothesis</div><div class="rbox-text" id="hyp-h0">Mean Sperm Count is equal between success and failure groups.</div></div>
+        <div class="rbox rbox-r"><div class="rbox-title" style="color:var(--coral)">H₁ — Alternative Hypothesis</div><div class="rbox-text" id="hyp-h1">Mean Sperm Count is significantly different between the two groups.</div></div>
+      </div>
+      <div class="chips" id="hyp-chips">
+        <div class="chip"><div class="chip-l">t-statistic</div><div class="chip-v" id="h-t">—</div></div>
+        <div class="chip"><div class="chip-l">p-value</div><div class="chip-v" id="h-p" style="color:var(--coral)">—</div></div>
+        <div class="chip"><div class="chip-l">Z-statistic</div><div class="chip-v" id="h-z">—</div></div>
+        <div class="chip"><div class="chip-l">Z p-value</div><div class="chip-v" id="h-zp">—</div></div>
+        <div class="chip"><div class="chip-l">Cohen's d</div><div class="chip-v" id="h-d">—</div></div>
+        <div class="chip"><div class="chip-l">Effect Size</div><div class="chip-v" id="h-eff">—</div></div>
+        <div class="chip"><div class="chip-l">Success μ</div><div class="chip-v" id="h-ms">—</div></div>
+        <div class="chip"><div class="chip-l">Failure μ</div><div class="chip-v" id="h-mf">—</div></div>
+      </div>
+      <div class="rbox rbox-g" id="hyp-decision-box">
+        <div class="rbox-title" id="hyp-verdict">—</div>
+        <div class="rbox-text" id="hyp-text">—</div>
+      </div>
+      <div class="g3">
+        <div class="cc"><div class="cc-t">Distribution Comparison</div><div class="cc-s">Overlapping histograms</div><div class="cw" style="height:250px"><canvas id="c-hdist" role="img" aria-label="Hypothesis distribution"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Mean ± 95% CI</div><div class="cc-s">Error bars computed on filtered data</div><div class="cw" style="height:250px"><canvas id="c-hbar" role="img" aria-label="Mean comparison bars"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Sperm Count — Box by Outcome</div><div class="cc-s">Distribution shape comparison</div><div class="cw" style="height:250px"><canvas id="c-hbox" role="img" aria-label="Hypothesis boxplot"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ══ REGRESSION ══ -->
+    <div class="pg" id="pg-regression">
+      <div class="sec-h">Simple Linear Regression</div>
+      <div class="sec-s">Both models refit by Python (sklearn) on filtered data · Coefficients, R², MAE, RMSE, equation</div>
+
+      <!-- REG 1 -->
+      <div style="font-size:1rem;font-weight:600;margin-bottom:.2rem">Regression 1 — Female Age → Male Age</div>
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:.9rem">Justification: Pearson r = 0.9593 (strongest in correlation heatmap). Social age-pairing.</div>
+      <div class="chips" id="r1-chips">
+        <div class="chip"><div class="chip-l">R²</div><div class="chip-v" id="r1-r2">—</div></div>
+        <div class="chip"><div class="chip-l">Pearson r</div><div class="chip-v" id="r1-r">—</div></div>
+        <div class="chip"><div class="chip-l">Slope</div><div class="chip-v" id="r1-sl">—</div></div>
+        <div class="chip"><div class="chip-l">Intercept</div><div class="chip-v" id="r1-ic">—</div></div>
+        <div class="chip"><div class="chip-l">MAE</div><div class="chip-v" id="r1-mae">—</div></div>
+        <div class="chip"><div class="chip-l">RMSE</div><div class="chip-v" id="r1-rmse">—</div></div>
+      </div>
+      <div class="g3" style="margin-bottom:0">
+        <div class="cc"><div class="cc-t">Scatter + Regression Line</div><div class="cw" style="height:260px"><canvas id="c-r1s" role="img" aria-label="Regression 1 scatter"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Actual vs Predicted</div><div class="cw" style="height:260px"><canvas id="c-r1a" role="img" aria-label="Regression 1 actual vs predicted"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Residual Plot</div><div class="cw" style="height:260px"><canvas id="c-r1r" role="img" aria-label="Regression 1 residuals"></canvas></div></div>
+      </div>
+      <div class="pred-box">
+        <h4>Live Prediction</h4>
+        <div class="srow"><label>Female Age</label><input type="range" min="20" max="45" value="30" id="r1sl" step="1" oninput="updateR1Pred()"><span class="srow-v" id="r1sv">30</span></div>
+        <div class="pred-out">
+          <div><div class="po-l">Predicted Male Age</div><div class="po-v" id="r1pred">—</div></div>
+          <div><div class="po-l">Live Equation</div><div style="font-family:var(--ffm);font-size:12px;color:var(--ink2);margin-top:.2rem" id="r1eq">—</div></div>
+        </div>
+      </div>
+
+      <hr class="div">
+
+      <!-- REG 2 -->
+      <div style="font-size:1rem;font-weight:600;margin-bottom:.2rem">Regression 2 — Sperm Motility % → Sperm Count</div>
+      <div style="font-size:12px;color:var(--ink2);margin-bottom:.9rem">Clinical pair — weak correlation. Demonstrates SLR limitations. Motivates Multiple Regression.</div>
+      <div class="chips" id="r2-chips">
+        <div class="chip"><div class="chip-l">R²</div><div class="chip-v" id="r2-r2" style="color:var(--coral)">—</div></div>
+        <div class="chip"><div class="chip-l">Pearson r</div><div class="chip-v" id="r2-r">—</div></div>
+        <div class="chip"><div class="chip-l">Slope</div><div class="chip-v" id="r2-sl">—</div></div>
+        <div class="chip"><div class="chip-l">Intercept</div><div class="chip-v" id="r2-ic">—</div></div>
+        <div class="chip"><div class="chip-l">MAE</div><div class="chip-v" id="r2-mae">—</div></div>
+        <div class="chip"><div class="chip-l">RMSE</div><div class="chip-v" id="r2-rmse">—</div></div>
+      </div>
+      <div class="g3" style="margin-bottom:0">
+        <div class="cc"><div class="cc-t">Scatter + Regression Line</div><div class="cw" style="height:260px"><canvas id="c-r2s" role="img" aria-label="Regression 2 scatter"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Actual vs Predicted</div><div class="cw" style="height:260px"><canvas id="c-r2a" role="img" aria-label="Regression 2 actual vs predicted"></canvas></div></div>
+        <div class="cc"><div class="cc-t">Residual Plot</div><div class="cw" style="height:260px"><canvas id="c-r2r" role="img" aria-label="Regression 2 residuals"></canvas></div></div>
+      </div>
+      <div class="pred-box">
+        <h4>Live Prediction</h4>
+        <div class="srow"><label>Sperm Motility %</label><input type="range" min="12" max="95" value="55" id="r2sl" step="1" oninput="updateR2Pred()"><span class="srow-v" id="r2sv">55</span></div>
+        <div class="pred-out">
+          <div><div class="po-l">Predicted Sperm Count</div><div class="po-v" id="r2pred">—</div></div>
+          <div><div class="po-l">Live Equation</div><div style="font-family:var(--ffm);font-size:12px;color:var(--ink2);margin-top:.2rem" id="r2eq">—</div></div>
+        </div>
+      </div>
+      <div class="rbox rbox-y" style="margin-top:1.2rem" id="viva-box">
+        <div class="rbox-title" style="color:var(--gold)">Summary</div>
+        <div class="rbox-text" id="vivaText">Loading…</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+/* ═══════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════ */
+const API = 'http://localhost:8000/api';
+const SAGE='#3a7550',CORAL='#bf4530',GOLD='#b5841c',PLUM='#6a3f6a',BLUE='#2a6ba0',SAND='#b8a887';
+const CHARTS={};
+
+let R1={slope:0.9988,intercept:3.5424};
+let R2={slope:-0.061,intercept:54.35};
+let scatterData=[];
+
+/* ═══════════════════════════════════════
+   CHART REGISTRY
+═══════════════════════════════════════ */
+function mkChart(id,cfg){
+  if(CHARTS[id]) CHARTS[id].destroy();
+  CHARTS[id]=new Chart(document.getElementById(id),cfg);
+}
+const BASE_OPTS={
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{labels:{font:{family:'Inter',size:11},color:'#1a1a1a'}}},
+  scales:{
+    x:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},
+    y:{ticks:{color:'#666',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}}
+  }
+};
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+function goPage(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  document.querySelectorAll('#sideNav a').forEach(a=>a.classList.remove('on'));
+  document.querySelectorAll('#sideNav a').forEach(a=>{
+    if(a.getAttribute('onclick')===`goPage('${id}')`) a.classList.add('on');
+  });
+}
+
+/* ═══════════════════════════════════════
+   FILTER PARAMS
+═══════════════════════════════════════ */
+function getParams(){
+  const p=new URLSearchParams();
+  p.set('age_min',document.getElementById('fAgeMin').value);
+  p.set('age_max',document.getElementById('fAgeMax').value);
+  const fields=[
+    ['fPcos','pcos'],['fPeriod','period'],['fFsmoke','f_smoke'],
+    ['fMsmoke','m_smoke'],['fFex','f_exercise'],['fMex','m_exercise'],
+    ['fFalc','f_alcohol'],['fMalc','m_alcohol'],['fOutcome','outcome']
+  ];
+  fields.forEach(([el,key])=>{
+    const v=document.getElementById(el).value;
+    if(v) p.set(key,v);
+  });
+  return p.toString();
+}
+
+function updateAgeLabel(){
+  const lo=document.getElementById('fAgeMin').value;
+  const hi=document.getElementById('fAgeMax').value;
+  document.getElementById('ageLabel').textContent=`${lo}–${hi}`;
+}
+
+function resetFilters(){
+  document.getElementById('fAgeMin').value=20;
+  document.getElementById('fAgeMax').value=45;
+  updateAgeLabel();
+  ['fPcos','fPeriod','fFsmoke','fMsmoke','fFex','fMex','fFalc','fMalc','fOutcome']
+    .forEach(id=>document.getElementById(id).value='');
+  refreshAll();
+}
+
+// Attach change listeners to all filter elements
+document.querySelectorAll('aside select, aside input[type=range]')
+  .forEach(el=>el.addEventListener('change',refreshAll));
+
+/* ═══════════════════════════════════════
+   LOADING & TOAST
+═══════════════════════════════════════ */
+let loadingCount=0;
+function showLoading(){loadingCount++;document.getElementById('loadingOverlay').classList.remove('hide');}
+function hideLoading(){if(--loadingCount<=0){loadingCount=0;document.getElementById('loadingOverlay').classList.add('hide');}}
+function toast(msg,ms=2800){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),ms);
+}
+
+/* ═══════════════════════════════════════
+   API FETCH HELPER
+═══════════════════════════════════════ */
+async function api(path){
+  try{
+    const r=await fetch(`${API}/${path}`);
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  } catch(e){
+    toast(`API error: ${e.message}`);
+    return null;
+  }
+}
+
+/* ═══════════════════════════════════════
+   REFRESH ALL PAGES
+═══════════════════════════════════════ */
+async function refreshAll(){
+  showLoading();
+  const q=getParams();
+  await Promise.all([
+    loadOverview(q),
+    loadEDA(q),
+    loadLifestyle(q),
+    loadScatterData(q),
+    loadHypothesis(),
+    loadRegression()
+  ]);
+  hideLoading();
+}
+
+/* ═══════════════════════════════════════
+   OVERVIEW
+═══════════════════════════════════════ */
+async function loadOverview(q){
+  const d=await api(`overview?${q}`);
+  if(!d) return;
+  const n=d.n, sr=d.success_rate;
+
+  // Sidebar & topbar
+  document.getElementById('sideN').textContent=n.toLocaleString();
+  document.getElementById('sideSR').textContent=sr.toFixed(1)+'%';
+  document.getElementById('topPill').textContent=`${n.toLocaleString()} couples · ${sr.toFixed(1)}% success`;
+
+  // Metric cards
+  setText('mc-n', n.toLocaleString());
+  setText('mc-ns',`of ${d.n_total.toLocaleString()} total`);
+  setText('mc-sr', sr.toFixed(1)+'%');
+  setText('mc-srs',`${d.n_success} successes`);
+  setText('mc-fa', d.avg_female_age.toFixed(1));
+  setText('mc-sc', d.avg_sperm_count.toFixed(1));
+  setText('mc-sl', d.avg_sleep.toFixed(2));
+  setText('mc-pcos', d.pcos_pct.toFixed(1)+'%');
+
+  // Outcome donut
+  const oc=d.outcome_counts;
+  mkChart('c-outcome',{type:'doughnut',
+    data:{labels:['Failure','Success'],datasets:[{data:[oc.Failure||0,oc.Success||0],backgroundColor:[CORAL+'cc',SAGE+'cc'],borderWidth:0}]},
+    options:{...BASE_OPTS,cutout:'65%'}
+  });
+
+  // Age success bar
+  const ag=d.age_success_rate||{};
+  const agKeys=Object.keys(ag).filter(k=>k!=='nan');
+  mkChart('c-agesr',{type:'bar',
+    data:{labels:agKeys,datasets:[{data:agKeys.map(k=>+(ag[k]||0).toFixed(2)),
+      backgroundColor:agKeys.map((_,i)=>[SAGE+'dd',SAGE+'bb',GOLD+'bb',CORAL+'99',CORAL+'dd'][i]||SAGE),
+      borderWidth:0,borderRadius:4}]},
+    options:{...BASE_OPTS,plugins:{legend:{display:false}},
+      scales:{y:{...BASE_OPTS.scales.y,min:0,max:35,ticks:{callback:v=>v+'%',color:'#666'}}}}
+  });
+
+  // Clinical averages
+  const ca=d.clinical_avgs||{};
+  const feats=['Sperm_Count_M_per_mL','Sperm_Motility_Pct','Sleep_Quality','Stress_Level'];
+  const lbls=['Sperm Cnt','Sperm Mot','Sleep','Stress'];
+  mkChart('c-clinavg',{type:'bar',
+    data:{labels:lbls,datasets:[
+      {label:'Success',data:feats.map(f=>(ca.Success||{})[f]||0),backgroundColor:SAGE+'bb',borderRadius:3,borderWidth:0},
+      {label:'Failure',data:feats.map(f=>(ca.Failure||{})[f]||0),backgroundColor:CORAL+'88',borderRadius:3,borderWidth:0}
+    ]},
+    options:{...BASE_OPTS,scales:{x:{ticks:{font:{size:10},color:'#666'},grid:{display:false}},y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}}}}
+  });
+
+  // Skewness
+  const sk=d.skewness||{};
+  const skKeys=Object.keys(sk);
+  const skVals=skKeys.map(k=>sk[k]);
+  mkChart('c-skew',{type:'bar',
+    data:{labels:skKeys.map(k=>k.replace(/_/g,' ').slice(0,10)),datasets:[{data:skVals,
+      backgroundColor:skVals.map(v=>v>0.5?CORAL+'cc':v<-0.5?BLUE+'cc':SAGE+'88'),
+      borderWidth:0,borderRadius:3}]},
+    options:{...BASE_OPTS,indexAxis:'y',plugins:{legend:{display:false}}}
+  });
+
+  // Heatmap
+  buildHeatmap(d.correlation||{});
+}
+
+/* ═══════════════════════════════════════
+   HEATMAP
+═══════════════════════════════════════ */
+function hmColor(r){
+  if(r>0.7) return['#1c4d30','#6fcf97'];
+  if(r>0.4) return['#2a5a38','#a5d8b5'];
+  if(r>0.15)return['#e5f2e9','#2a6a42'];
+  if(r>-0.15)return['#f4f1ec','#999'];
+  if(r>-0.4)return['#faeae6','#b04030'];
+  return['#f5ccc4','#7b1f10'];
+}
+function buildHeatmap(corr){
+  const keys=Object.keys(corr);
+  if(!keys.length) return;
+  const cont=document.getElementById('hmContainer');
+  const cw=Math.max(38,Math.min(55,Math.floor((cont.offsetWidth-120)/keys.length)));
+  let html='<div style="display:flex;gap:2px;font-family:var(--ffm)">';
+  html+=`<div style="display:flex;flex-direction:column;gap:2px;padding-top:${cw+6}px">`;
+  keys.forEach(k=>{html+=`<div style="height:${cw}px;display:flex;align-items:center;font-size:10px;color:#666;padding-right:4px;justify-content:flex-end;white-space:nowrap">${k.replace(/_/g,' ').slice(0,12)}</div>`;});
+  html+='</div><div>';
+  html+=`<div style="display:flex;gap:2px;margin-bottom:3px">`;
+  keys.forEach(k=>{html+=`<div style="width:${cw}px;font-size:9px;color:#666;overflow:hidden;transform:rotate(-35deg) translateX(6px);transform-origin:bottom left;white-space:nowrap">${k.replace(/_/g,' ').slice(0,10)}</div>`;});
+  html+='</div><div style="display:flex;flex-direction:column;gap:2px">';
+  keys.forEach(r=>{
+    html+='<div style="display:flex;gap:2px">';
+    keys.forEach(c=>{
+      const v=(corr[r]||{})[c]||0;
+      const [bg,fg]=hmColor(v);
+      html+=`<div class="hm-cell" style="width:${cw}px;height:${cw}px;background:${bg};color:${fg}" title="${r} × ${c}: ${v.toFixed(3)}">${v.toFixed(2)}</div>`;
+    });
+    html+='</div>';
+  });
+  html+='</div></div></div>';
+  cont.innerHTML=html;
+}
+
+/* ═══════════════════════════════════════
+   EDA
+═══════════════════════════════════════ */
+async function loadEDA(q){
+  const histCols=[
+    ['Female_Age','Female Age','#3a7550'],['Sperm_Count_M_per_mL','Sperm Count','#b5841c'],
+    ['Sperm_Motility_Pct','Sperm Motility','#6a3f6a'],['Stress_Level','Stress Level','#bf4530'],
+    ['Sleep_Quality','Sleep Quality','#2a6ba0'],['Female_BMI','Female BMI','#2a6ba0'],
+    ['Male_Age','Male Age','#3a7550'],['Past_Pregnancies','Past Pregnancies','#b5841c']
+  ];
+  const grid=document.getElementById('hist-grid');
+  grid.innerHTML='';
+
+  const results=await Promise.all(
+    histCols.map(([col])=>api(`histogram/${col}?${q}&bins=25`))
+  );
+
+  results.forEach((d,i)=>{
+    if(!d) return;
+    const [col,lbl,color]=histCols[i];
+    const cid=`hist-${col.replace(/_/g,'')}`;
+    grid.insertAdjacentHTML('beforeend',
+      `<div class="cc"><div class="cc-t">${lbl}</div><div class="cc-s">skew=${d.skewness} · μ=${d.mean.toFixed(2)}</div><div class="cw" style="height:180px"><canvas id="${cid}" role="img" aria-label="${lbl} histogram"></canvas></div></div>`
+    );
+    mkChart(cid,{type:'bar',
+      data:{labels:d.bins,datasets:[{data:d.counts,backgroundColor:color+'99',borderWidth:0,borderRadius:2}]},
+      options:{...BASE_OPTS,plugins:{legend:{display:false}},
+        scales:{x:{ticks:{font:{size:9},color:'#666',maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},
+                y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}}}}
+    });
+  });
+
+  // Boxplot-style bars by outcome (using histogram by_outcome mean approximation)
+  const scData=await api(`histogram/Sperm_Count_M_per_mL?${q}&bins=20`);
+  const slData=await api(`histogram/Sleep_Quality?${q}&bins=20`);
+  const stData=await api(`histogram/Stress_Level?${q}&bins=20`);
+
+  if(scData){
+    const sc_s=(scData.by_outcome||{}).Success||{}, sc_f=(scData.by_outcome||{}).Failure||{};
+    mkChart('c-box1',{type:'bar',
+      data:{labels:scData.bins,datasets:[
+        {label:`Success (μ=${sc_s.mean||0})`,data:sc_s.counts||[],backgroundColor:SAGE+'66',borderColor:SAGE,borderWidth:1},
+        {label:`Failure (μ=${sc_f.mean||0})`,data:sc_f.counts||[],backgroundColor:CORAL+'44',borderColor:CORAL,borderWidth:1}
+      ]},
+      options:{...BASE_OPTS,scales:{x:{ticks:{font:{size:9},color:'#666',maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}}}}
+    });
+  }
+  if(slData){
+    const sl_s=(slData.by_outcome||{}).Success||{}, sl_f=(slData.by_outcome||{}).Failure||{};
+    mkChart('c-box2',{type:'bar',
+      data:{labels:slData.bins,datasets:[
+        {label:`Success`,data:sl_s.counts||[],backgroundColor:SAGE+'66',borderColor:SAGE,borderWidth:1},
+        {label:`Failure`,data:sl_f.counts||[],backgroundColor:CORAL+'44',borderColor:CORAL,borderWidth:1}
+      ]},
+      options:{...BASE_OPTS,scales:{x:{ticks:{font:{size:9},color:'#666',maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}}}}
+    });
+  }
+  if(stData){
+    const st_s=(stData.by_outcome||{}).Success||{}, st_f=(stData.by_outcome||{}).Failure||{};
+    mkChart('c-box3',{type:'bar',
+      data:{labels:stData.bins,datasets:[
+        {label:`Success`,data:st_s.counts||[],backgroundColor:SAGE+'66',borderColor:SAGE,borderWidth:1},
+        {label:`Failure`,data:st_f.counts||[],backgroundColor:CORAL+'44',borderColor:CORAL,borderWidth:1}
+      ]},
+      options:{...BASE_OPTS,scales:{x:{ticks:{font:{size:9},color:'#666',maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}}}}
+    });
+  }
+}
+
+/* ═══════════════════════════════════════
+   LIFESTYLE
+═══════════════════════════════════════ */
+async function loadLifestyle(q){
+  const d=await api(`lifestyle?${q}`);
+  if(!d) return;
+  const overall=d.overall_success_rate||0;
+  const factors=d.factors||{};
+
+  const container=document.getElementById('lifestyle-charts');
+  container.innerHTML='';
+
+  const factorOrder=[
+    'PCOS','Period_Regularity','Female_Smokes','Male_Smokes',
+    'Female_Exercise','Male_Exercise','Female_Alcohol','Male_Alcohol','Past_Pregnancies'
+  ];
+
+  factorOrder.forEach(fname=>{
+    if(!factors[fname]) return;
+    const rows=factors[fname];
+    const cid=`lc-${fname.replace(/_/g,'')}`;
+    const labels=rows.map(r=>r.category);
+    const rates=rows.map(r=>r.rate);
+    container.insertAdjacentHTML('beforeend',
+      `<div class="cc"><div class="cc-t">${fname.replace(/_/g,' ')}</div><div class="cc-s" id="ls-${cid}"></div><div class="cw" style="height:180px"><canvas id="${cid}" role="img" aria-label="${fname} success rate"></canvas></div></div>`
+    );
+    mkChart(cid,{type:'bar',
+      data:{labels,datasets:[{data:rates,
+        backgroundColor:rates.map(v=>v>=overall*1.05?SAGE+'cc':v<=overall*0.95?CORAL+'88':GOLD+'99'),
+        borderWidth:0,borderRadius:4}]},
+      options:{...BASE_OPTS,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw.toFixed(1)}% (n=${rows[c.dataIndex].count})`}}},
+        scales:{y:{min:0,max:Math.max(35,...rates)+5,ticks:{callback:v=>v+'%',color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10},color:'#666'},grid:{display:false}}}}
+    });
+  });
+
+  // Impact table
+  const tbody=document.getElementById('ltbody');
+  const allRows=[];
+  factorOrder.forEach(fname=>{
+    (factors[fname]||[]).forEach(r=>{
+      allRows.push({factor:fname.replace(/_/g,' '),category:r.category,count:r.count,rate:r.rate,diff:r.diff});
+    });
+  });
+  allRows.sort((a,b)=>b.rate-a.rate);
+  tbody.innerHTML=allRows.map(r=>{
+    const bdg=r.diff>=0?`<span class="bdg bdg-u">+${r.diff.toFixed(1)}%</span>`:`<span class="bdg bdg-d">${r.diff.toFixed(1)}%</span>`;
+    return `<tr><td style="font-weight:500">${r.factor}</td><td>${r.category}</td><td style="font-family:var(--ffm)">${r.count}</td><td style="font-family:var(--ffm)">${r.rate.toFixed(1)}%</td><td>${bdg}</td></tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   SCATTER EXPLORER
+═══════════════════════════════════════ */
+async function loadScatterData(q){
+  const x=document.getElementById('scX').value;
+  const y=document.getElementById('scY').value;
+  const d=await api(`scatter?x=${x}&y=${y}&${q}&max_points=600`);
+  if(!d) return;
+  scatterData=d.points||[];
+  document.getElementById('scCount').textContent=`${d.n} couples`;
+  renderScatter();
+  await loadScatterDists(q);
+}
+async function loadScatter(){
+  showLoading();
+  await loadScatterData(getParams());
+  hideLoading();
+}
+function renderScatter(){
+  const colorBy=document.getElementById('scColor').value;
+  const sF=scatterData.filter(p=>p.outcome==='Success');
+  const fF=scatterData.filter(p=>p.outcome==='Failure');
+  const xLabel=document.getElementById('scX').options[document.getElementById('scX').selectedIndex].text;
+  const yLabel=document.getElementById('scY').options[document.getElementById('scY').selectedIndex].text;
+  mkChart('c-scatter',{type:'scatter',
+    data:{datasets:[
+      {label:'Success',data:sF.map(p=>({x:p.x,y:p.y})),backgroundColor:SAGE+'88',borderColor:SAGE+'cc',pointRadius:3.5,pointHoverRadius:5},
+      {label:'Failure',data:fF.map(p=>({x:p.x,y:p.y})),backgroundColor:CORAL+'44',borderColor:CORAL+'88',pointRadius:3,pointHoverRadius:4}
+    ]},
+    options:{...BASE_OPTS,layout:{padding:12},
+      scales:{x:{title:{display:true,text:xLabel,color:'#666'},ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.04)'}},
+              y:{title:{display:true,text:yLabel,color:'#666'},ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.04)'}}}}
+  });
+}
+async function loadScatterDists(q){
+  const [scD,smD]=await Promise.all([
+    api(`histogram/Sperm_Count_M_per_mL?${q}&bins=20`),
+    api(`histogram/Sperm_Motility_Pct?${q}&bins=20`)
+  ]);
+  if(scD){
+    const sc_s=(scD.by_outcome||{}).Success||{}, sc_f=(scD.by_outcome||{}).Failure||{};
+    setText('sc-dist-s',`Success μ=${(sc_s.mean||0).toFixed(2)} · Failure μ=${(sc_f.mean||0).toFixed(2)} M/mL`);
+    mkChart('c-scdist',{type:'bar',data:{labels:scD.bins,datasets:[
+      {label:`Success μ=${(sc_s.mean||0).toFixed(1)}`,data:sc_s.counts||[],backgroundColor:SAGE+'66',borderColor:SAGE,borderWidth:1},
+      {label:`Failure μ=${(sc_f.mean||0).toFixed(1)}`,data:sc_f.counts||[],backgroundColor:CORAL+'44',borderColor:CORAL,borderWidth:1}
+    ]},options:{...BASE_OPTS,scales:{x:{ticks:{font:{size:9},color:'#666',maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+  }
+  if(smD){
+    const sm_s=(smD.by_outcome||{}).Success||{}, sm_f=(smD.by_outcome||{}).Failure||{};
+    setText('sm-dist-s',`Success μ=${(sm_s.mean||0).toFixed(2)} · Failure μ=${(sm_f.mean||0).toFixed(2)} %`);
+    mkChart('c-smdist',{type:'bar',data:{labels:smD.bins,datasets:[
+      {label:`Success μ=${(sm_s.mean||0).toFixed(1)}`,data:sm_s.counts||[],backgroundColor:SAGE+'66',borderColor:SAGE,borderWidth:1},
+      {label:`Failure μ=${(sm_f.mean||0).toFixed(1)}`,data:sm_f.counts||[],backgroundColor:CORAL+'44',borderColor:CORAL,borderWidth:1}
+    ]},options:{...BASE_OPTS,scales:{x:{ticks:{font:{size:9},color:'#666',maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+  }
+}
+
+/* ═══════════════════════════════════════
+   HYPOTHESIS TESTING
+═══════════════════════════════════════ */
+async function loadHypothesis(){
+  const v=document.getElementById('hypVar').value;
+  const q=getParams();
+  const d=await api(`hypothesis?variable=${v}&${q}`);
+  if(!d || d.error) return;
+
+  setText('h-t', d.t_stat.toFixed(4));
+  setText('h-p', d.p_value < 0.0001 ? '<0.0001' : d.p_value.toFixed(5));
+  setText('h-z', d.z_stat.toFixed(4));
+  setText('h-zp',d.z_p < 0.0001 ? '<0.0001' : d.z_p.toFixed(5));
+  setText('h-d', d.cohens_d.toFixed(4));
+  setText('h-eff',d.effect);
+  setText('h-ms',`${d.success.mean.toFixed(3)} (n=${d.success.n})`);
+  setText('h-mf',`${d.failure.mean.toFixed(3)} (n=${d.failure.n})`);
+
+  const box=document.getElementById('hyp-decision-box');
+  box.className='rbox '+(d.reject?'rbox-g':'rbox-r');
+  const diff=(d.success.mean - d.failure.mean).toFixed(3);
+  setText('hyp-verdict',d.reject?'✅ Decision: REJECT H₀':'❌ Decision: FAIL TO REJECT H₀');
+  setText('hyp-text', d.reject
+    ? `p-value (${d.p_value.toFixed(5)}) < α (${d.alpha}). Significant difference: Success μ=${d.success.mean.toFixed(3)} vs Failure μ=${d.failure.mean.toFixed(3)} (Δ=${diff}). Cohen's d=${d.cohens_d.toFixed(3)} → ${d.effect} effect. Both T-test and Z-test agree.`
+    : `p-value (${d.p_value.toFixed(5)}) ≥ α (${d.alpha}). Insufficient evidence to reject H₀ given the current filter selection.`
+  );
+
+  // Distribution chart
+  mkChart('c-hdist',{type:'bar',
+    data:{labels:d.dist_bins,datasets:[
+      {label:`Success μ=${d.success.mean.toFixed(2)}`,data:d.dist_success,backgroundColor:SAGE+'66',borderColor:SAGE,borderWidth:1},
+      {label:`Failure μ=${d.failure.mean.toFixed(2)}`,data:d.dist_failure,backgroundColor:CORAL+'44',borderColor:CORAL,borderWidth:1}
+    ]},
+    options:{...BASE_OPTS,scales:{x:{ticks:{font:{size:9},color:'#666',maxRotation:0,autoSkip:true,maxTicksLimit:8},grid:{display:false}},y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}}}}
+  });
+
+  // Mean + CI bars
+  mkChart('c-hbar',{type:'bar',
+    data:{labels:['Success','Failure'],datasets:[{
+      data:[d.success.mean,d.failure.mean],
+      backgroundColor:[SAGE+'cc',CORAL+'88'],borderWidth:0,borderRadius:5,
+      error:[d.success.ci95,d.failure.ci95]
+    }]},
+    options:{...BASE_OPTS,plugins:{legend:{display:false},
+      tooltip:{callbacks:{afterLabel:c=>c.dataIndex===0?`95% CI: [${(d.success.mean-d.success.ci95).toFixed(2)}, ${(d.success.mean+d.success.ci95).toFixed(2)}]`:`95% CI: [${(d.failure.mean-d.failure.ci95).toFixed(2)}, ${(d.failure.mean+d.failure.ci95).toFixed(2)}]`}}},
+      scales:{y:{min:Math.min(d.success.mean,d.failure.mean)*0.92,
+        max:Math.max(d.success.mean,d.failure.mean)*1.1,ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{ticks:{color:'#666'},grid:{display:false}}}}
+  });
+
+  // Sperm count boxplot (approximation bars)
+  mkChart('c-hbox',{type:'bar',
+    data:{labels:[`Success\n(μ=${d.success.mean.toFixed(2)})`,`Failure\n(μ=${d.failure.mean.toFixed(2)})`],
+      datasets:[{data:[d.success.mean,d.failure.mean],backgroundColor:[SAGE+'cc',CORAL+'88'],borderWidth:0,borderRadius:5}]},
+    options:{...BASE_OPTS,plugins:{legend:{display:false}},
+      scales:{y:{ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{color:'#666'},grid:{display:false}}}}
+  });
+}
+
+/* ═══════════════════════════════════════
+   REGRESSION
+═══════════════════════════════════════ */
+async function loadRegression(){
+  const q=getParams();
+  const [d1,d2]=await Promise.all([
+    api(`regression/1?${q}`),
+    api(`regression/2?${q}`)
+  ]);
+  if(d1) renderReg(d1,1);
+  if(d2) renderReg(d2,2);
+  if(d1&&d2) updateVivaText(d1,d2);
+}
+
+function renderReg(d,n){
+  R1={slope:d.slope,intercept:d.intercept};
+  if(n===2) R2={slope:d.slope,intercept:d.intercept};
+
+  const pfx=`r${n}`;
+  setText(`${pfx}-r2`, d.r2.toFixed(4));
+  setText(`${pfx}-r`,  d.pearson_r.toFixed(4));
+  setText(`${pfx}-sl`, d.slope.toFixed(4));
+  setText(`${pfx}-ic`, d.intercept.toFixed(4));
+  setText(`${pfx}-mae`,d.mae.toFixed(4));
+  setText(`${pfx}-rmse`,d.rmse.toFixed(4));
+  setText(`${pfx}eq`, d.equation);
+
+  const colors={1:[BLUE,CORAL],2:[PLUM,GOLD]};
+  const [cPt,cLine]=colors[n];
+
+  // Scatter + line
+  mkChart(`c-r${n}s`,{type:'scatter',
+    data:{datasets:[
+      {label:'Data',data:d.scatter,backgroundColor:cPt+'55',borderColor:cPt+'99',pointRadius:3.5},
+      {label:'Regression line',
+        data:d.line_x.map((x,i)=>({x,y:d.line_y[i]})),
+        type:'line',borderColor:cLine,borderWidth:2.5,pointRadius:0,fill:false,tension:0}
+    ]},
+    options:{...BASE_OPTS,
+      scales:{x:{title:{display:true,text:d.x_col.replace(/_/g,' '),color:'#666'},ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.04)'}},
+              y:{title:{display:true,text:d.y_col.replace(/_/g,' '),color:'#666'},ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.04)'}}}}
+  });
+
+  // Actual vs Predicted
+  const avp=d.actual_vs_pred||[];
+  const mn=Math.min(...avp.map(p=>Math.min(p.actual,p.pred)));
+  const mx=Math.max(...avp.map(p=>Math.max(p.actual,p.pred)));
+  mkChart(`c-r${n}a`,{type:'scatter',
+    data:{datasets:[
+      {label:'Points',data:avp.map(p=>({x:p.actual,y:p.pred})),backgroundColor:cPt+'55',borderColor:cPt+'99',pointRadius:4},
+      {label:'Perfect',data:[{x:mn,y:mn},{x:mx,y:mx}],type:'line',borderColor:'red',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false}
+    ]},
+    options:{...BASE_OPTS,
+      scales:{x:{title:{display:true,text:'Actual',color:'#666'},ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.04)'}},
+              y:{title:{display:true,text:'Predicted',color:'#666'},ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.04)'}}}}
+  });
+
+  // Residuals
+  mkChart(`c-r${n}r`,{type:'scatter',
+    data:{datasets:[
+      {label:'Residuals',data:d.residuals,backgroundColor:cPt+'55',borderColor:cPt+'99',pointRadius:4},
+      {label:'Zero line',data:(d.line_x||[]).map(x=>({x:d.slope*x+d.intercept,y:0})).slice(0,2),
+        type:'line',borderColor:'red',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false}
+    ]},
+    options:{...BASE_OPTS,
+      scales:{x:{title:{display:true,text:'Predicted',color:'#666'},ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.04)'}},
+              y:{title:{display:true,text:'Residuals',color:'#666'},ticks:{color:'#666'},grid:{color:'rgba(0,0,0,0.04)'}}}}
+  });
+
+  if(n===1){R1.slope=d.slope;R1.intercept=d.intercept;updateR1Pred();}
+  else{R2.slope=d.slope;R2.intercept=d.intercept;updateR2Pred();}
+}
+
+function updateR1Pred(){
+  const v=parseInt(document.getElementById('r1sl').value);
+  setText('r1sv', v);
+  const pred=(R1.slope*v+R1.intercept).toFixed(1);
+  setText('r1pred', pred+' yrs');
+}
+function updateR2Pred(){
+  const v=parseInt(document.getElementById('r2sl').value);
+  setText('r2sv', v);
+  const pred=Math.max(0,R2.slope*v+R2.intercept).toFixed(2);
+  setText('r2pred', pred+' M/mL');
+}
+
+function updateVivaText(d1,d2){
+  document.getElementById('vivaText').innerHTML=
+    `<b>Regression 1</b> (Female Age → Male Age): R² = ${d1.r2.toFixed(4)} on ${d1.n_train+d1.n_test} filtered rows. ${d1.r2>0.8?'Very strong — social age-pairing confirmed.':'Age-pairing weakened by current filter subset.'}<br><br>
+     <b>Regression 2</b> (Sperm Motility → Sperm Count): R² = ${d2.r2.toFixed(4)}. ${d2.r2<0.05?'Near-zero R² confirms biological independence — key SLR lesson. Motivates Multiple Regression.':'Some relationship present in this subset.'}<br><br>
+     <b></b><i><b></b>`;
+}
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function setText(id,val){const el=document.getElementById(id);if(el) el.textContent=val;}
+
+/* ═══════════════════════════════════════
+   BOOT
+═══════════════════════════════════════ */
+window.addEventListener('load',async()=>{
+  await refreshAll();
+  // Also attach filter listeners properly
+  document.querySelectorAll('aside select, aside input[type=range]')
+    .forEach(el=>el.addEventListener('change',refreshAll));
+});
+</script>
+</body>
+</html>
