@@ -9,7 +9,7 @@ warnings.filterwarnings("ignore")
 sns.set_theme(style="whitegrid", palette="Set2")
 plt.rcParams["figure.dpi"] = 130
 
-# ── STEP 1: Load ─────────────────────────────────────────────
+# ── STEP 1: Load ─────────────────────────────────────────
 df = pd.read_csv("fertility_health_dataset.csv")
 print("=" * 60)
 print("STEP 1 — Dataset Loaded")
