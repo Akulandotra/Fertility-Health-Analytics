@@ -174,7 +174,7 @@ def overview(
     return JSONResponse(clean(result))
 
 
-# ── 2. Lifestyle Success Rates ────────────────────────────────
+# ── 2. Lifestyle Success Rates ──────────────────────────────
 @app.get("/api/lifestyle")
 def lifestyle(
     age_min: int = Query(20), age_max: int = Query(45),
