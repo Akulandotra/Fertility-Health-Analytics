@@ -7,7 +7,7 @@ This project demonstrates practical applications of data analysis techniques, in
 
 ---
 
-## Objectives
+## Objectives hello
 - Perform data preprocessing and cleaning  
 - Conduct exploratory data analysis (EDA)  
 - Detect patterns, trends, and correlations  
