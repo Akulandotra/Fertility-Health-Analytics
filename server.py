@@ -1,17 +1,3 @@
-# =============================================================
-#  FILE: server.py
-#  PURPOSE: FastAPI backend — reads fertility_clean.csv and
-#           exposes REST API endpoints consumed by the HTML
-#           dashboard. Every endpoint accepts filter query
-#           params so the frontend gets LIVE recalculated
-#           stats, not hardcoded numbers.
-#
-#  Run with:  python server.py
-#             (Opens at http://localhost:8000)
-#  API docs:  http://localhost:8000/docs
-# =============================================================
-
-from fastapi import FastAPI, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
