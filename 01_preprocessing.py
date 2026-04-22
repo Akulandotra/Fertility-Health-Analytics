@@ -1,11 +1,3 @@
-# =============================================================
-#  FILE: 01_preprocessing.py
-#  PURPOSE: Load raw CSV, inspect structure, simulate and
-#           handle missing values using all four methods,
-#           detect outliers via IQR and Z-Score, export
-#           fertility_clean.csv for all subsequent scripts.
-# =============================================================
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
