@@ -99,7 +99,7 @@ plt.tight_layout()
 plt.savefig("01_outlier_boxplots.png", bbox_inches="tight")
 plt.show()
 
-# ── STEP 6: Export ────────────────────────────────────────────
+# ── STEP 6: Export ─────────────────────────────────────────
 df_clean.to_csv("fertility_clean.csv", index=False)
 print(f"\nExported: fertility_clean.csv  {df_clean.shape}")
 print("✓ Preprocessing complete")
